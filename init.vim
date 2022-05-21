@@ -42,6 +42,8 @@ Plug 'bling/vim-bufferline'  " show opened buffers at bottom
 " Colorscheme; other colorschemes supported by treesitter are at [1]
 " [1]: https://github.com/rockerBOO/awesome-neovim#tree-sitter-supported-colorscheme
 Plug 'tanvirtin/monokai.nvim'
+
+Plug 'axelf4/vim-strip-trailing-whitespace'  " only remove whitespace from edited lines
 call plug#end()
 
 " Setup various plugins
@@ -124,15 +126,6 @@ let g:lightline = {'colorscheme': 'wombat',
       \ }
 " highlight DiffAdd ctermbg=blue ctermfg=blue guibg=green guifg=green
 " ^for git gutter, handled by monokai colorscheme
-
-" Remove all trailing spaces every write
-fun! <SID>StripTrailingWhitespaces()
-    let l = line(".")
-    let c = col(".")
-    %s/\s\+$//e
-    call cursor(l, c)
-endfun
-autocmd BufWritePre * :call <SID>StripTrailingWhitespace()
 
 " so that lsp-installer places hooks in the right places (according to readme)
 " (this config is longer than I'd like, but it's required; it's from their
