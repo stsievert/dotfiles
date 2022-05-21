@@ -7,8 +7,9 @@
 " * Searching:
 "     *  <leader>ff := find files in current git repo
 "     *  <leader>ft := find text in current git repo
-"     *  <leader>fb := search buffers
 "     *  <leader>fh := search help tags
+"     *  <leader>fb := search buffers
+"     *  <leader>b := see list of open buffers, select one with decent autocomplete
 
 call plug#begin()
 " Searching
@@ -34,10 +35,13 @@ Plug 'Yggdroot/indentLine'  " display the thin vertical lines on indent
 Plug 'dietsche/vim-lastplace' " keep editing place consitent open/close
 Plug 'airblade/vim-gitgutter'  " show git tags in sidebar
 Plug 'itchyny/vim-gitbranch'  " for showing current git brach
-" Plug 'nvim-lualine/lualine.nvim'  " for status line
 Plug 'itchyny/lightline.vim'  " for swtatus line
 Plug 'itchyny/vim-gitbranch'
-Plug 'bling/vim-bufferline'
+Plug 'bling/vim-bufferline'  " show opened buffers at bottom
+
+" Colorscheme; other colorschemes supported by treesitter are at [1]
+" [1]: https://github.com/rockerBOO/awesome-neovim#tree-sitter-supported-colorscheme
+Plug 'tanvirtin/monokai.nvim'
 call plug#end()
 
 let mapleader=" "  " <Leader>
@@ -51,6 +55,7 @@ nnoremap <leader>ff <cmd>lua require('telescope.builtin').find_files{ cwd = vim.
 nnoremap <leader>ft <cmd>lua require('telescope.builtin').live_grep{ cwd = vim.fn.systemlist("git rev-parse --show-toplevel")[1] }<cr>
 nnoremap <Leader>b :ls<CR>:b<Space>
 
+set noshowmode  " hide --INSERT-- at bottom so buffers always show
 set showtabline=1
 set smartcase  " use smart case while searching
 
@@ -59,7 +64,7 @@ set encoding=UTF-8
 let printencoding='utf-8'
 set termguicolors
 
-set nocompatible  " be v-improved
+" set nocompatible  " nvim is always v-improved
 set nospell
 set nu  " set numbers on every line
 set relativenumber  " set relative numbers on every line (except current)
@@ -86,10 +91,9 @@ set noswapfile " because we save so often
 " Let vim remember history, which allows undo at any point
 set undofile                " Save undos after file closes
 set undodir=$HOME/.nvim/nvim/undo " where to save undo histories
-set undolevels=10000         " How many undos
-set undoreload=100000        " number of lines to save for undo
+set undolevels=1000         " How many undos
+set undoreload=10000        " number of lines to save for undo
 
-colorscheme molokai
 let g:lightline = {'colorscheme': 'wombat',
       \ 'active': {
       \   'left': [ [ 'mode', 'paste' ],
@@ -119,7 +123,14 @@ lua <<EOF
 require("nvim-lsp-installer").setup({})
 require'lspconfig'.pylsp.setup{}
 require('Comment').setup()
+
+local monokai = require('monokai')
+local palette = monokai.pro
+monokai.setup {
+    palette = {base2 = "#181818"}
+}
 EOF
+
 
 " so that lsp-installer places hooks in the right places (according to readme)
 " (this config is longer than I'd like, but it's required; it's from their
