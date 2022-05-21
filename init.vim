@@ -5,15 +5,16 @@
 " * `gc` to comment/uncomment visual selection
 " * normal editor (git shown in sidebar, last place)
 " * Searching:
-"     *  <leader>ff := find files
-"     *  <leader>fs := search in current file (grep)
+"     *  <leader>ff := find files in current git repo
+"     *  <leader>ft := find text in current git repo
 "     *  <leader>fb := search buffers
 "     *  <leader>fh := search help tags
 
 call plug#begin()
 " Searching
-Plug 'nvim-lua/plenary.nvim'  " for telescope
+Plug 'nvim-lua/plenary.nvim'  " for telescope 
 Plug 'nvim-telescope/telescope.nvim'  " for finding files, searching, etc
+Plug 'BurntSushi/ripgrep'  " required for live_grep
 
 " Autocomplete
 Plug 'neovim/nvim-lspconfig'  " Common LSP configs
@@ -32,16 +33,26 @@ Plug 'wellle/targets.vim'  " new text objects (e.g., `ci,`)
 Plug 'Yggdroot/indentLine'  " display the thin vertical lines on indent
 Plug 'dietsche/vim-lastplace' " keep editing place consitent open/close
 Plug 'airblade/vim-gitgutter'  " show git tags in sidebar
-
+Plug 'itchyny/vim-gitbranch'  " for showing current git brach
+" Plug 'nvim-lualine/lualine.nvim'  " for status line
+Plug 'itchyny/lightline.vim'  " for swtatus line
+Plug 'itchyny/vim-gitbranch'
+Plug 'bling/vim-bufferline'
 call plug#end()
 
-let mapleader=" "
+let mapleader=" "  " <Leader>
+set updatetime=1000  " git gutter every 1s (swap files, etc too)
+set laststatus=2  " always show status bar
 
 " Find files using Telescope command-line sugar.
-nnoremap <leader>ff <cmd>Telescope find_files<cr>
-nnoremap <leader>fs <cmd>Telescope live_grep<cr>
 nnoremap <leader>fb <cmd>Telescope buffers<cr>
 nnoremap <leader>fh <cmd>Telescope help_tags<cr>
+nnoremap <leader>ff <cmd>lua require('telescope.builtin').find_files{ cwd = vim.fn.systemlist("git rev-parse --show-toplevel")[1] }<cr>
+nnoremap <leader>ft <cmd>lua require('telescope.builtin').live_grep{ cwd = vim.fn.systemlist("git rev-parse --show-toplevel")[1] }<cr>
+nnoremap <Leader>b :ls<CR>:b<Space>
+
+set showtabline=1
+set smartcase  " use smart case while searching
 
 " set cliboard+=unnamedplus  " if want system copy/paste integration
 set encoding=UTF-8
@@ -79,6 +90,16 @@ set undolevels=10000         " How many undos
 set undoreload=100000        " number of lines to save for undo
 
 colorscheme molokai
+let g:lightline = {'colorscheme': 'wombat',
+      \ 'active': {
+      \   'left': [ [ 'mode', 'paste' ],
+      \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ]
+      \ },
+      \ 'component_function': {
+      \   'gitbranch': 'gitbranch#name'
+      \ },
+      \ }
+highlight DiffAdd ctermbg=blue ctermfg=blue guibg=green guifg=green
 
 autocmd BufNew,BufNewFile,BufReadPost,BufRead *.txt,*.text,*.md,*.markdown,*.rst setlocal filetype=markdown
 " autocmd BufNewFile,BufReadPost *.md,*.rst setlocal filetype=markdown
