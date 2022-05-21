@@ -44,80 +44,6 @@ Plug 'bling/vim-bufferline'  " show opened buffers at bottom
 Plug 'tanvirtin/monokai.nvim'
 call plug#end()
 
-let mapleader=" "  " <Leader>
-set updatetime=1000  " git gutter every 1s (swap files, etc too)
-set laststatus=2  " always show status bar
-
-" Find files using Telescope command-line sugar.
-nnoremap <leader>fb <cmd>Telescope buffers<cr>
-nnoremap <leader>fh <cmd>Telescope help_tags<cr>
-nnoremap <leader>ff <cmd>lua require('telescope.builtin').find_files{ cwd = vim.fn.systemlist("git rev-parse --show-toplevel")[1] }<cr>
-nnoremap <leader>ft <cmd>lua require('telescope.builtin').live_grep{ cwd = vim.fn.systemlist("git rev-parse --show-toplevel")[1] }<cr>
-nnoremap <Leader>b :ls<CR>:b<Space>
-
-set noshowmode  " hide --INSERT-- at bottom so buffers always show
-set showtabline=1
-set smartcase  " use smart case while searching
-
-" set cliboard+=unnamedplus  " if want system copy/paste integration
-set encoding=UTF-8
-let printencoding='utf-8'
-set termguicolors
-
-" set nocompatible  " nvim is always v-improved
-set nospell
-set nu  " set numbers on every line
-set relativenumber  " set relative numbers on every line (except current)
-set numberwidth=2
-set completeopt=menu,menuone,preview
-set autowrite  " write with :e, :w, etc. Always write to disk
-set breakindent  " keep indent for long lines that wrap
-set shortmess=a " limited "Hit <Enter> to continue" prompts
-set title " set the title to filename
-set scrolloff=4  " buffer for scrolling
-set colorcolumn=80 " highlight comlumn 80
-set autochdir " auto change to directory of file?
-"set formatoptions-=t " don't insert a newline when we get to 80chars!
-set history=50 " keep a long history
-" easier folding of functions
-syntax on " highlight syntax!
-nnoremap gj j
-nnoremap gk k
-nnoremap j gj
-nnoremap k gk
-
-set noswapfile " because we save so often
-
-" Let vim remember history, which allows undo at any point
-set undofile                " Save undos after file closes
-set undodir=$HOME/.nvim/nvim/undo " where to save undo histories
-set undolevels=1000         " How many undos
-set undoreload=10000        " number of lines to save for undo
-
-let g:lightline = {'colorscheme': 'wombat',
-      \ 'active': {
-      \   'left': [ [ 'mode', 'paste' ],
-      \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ]
-      \ },
-      \ 'component_function': {
-      \   'gitbranch': 'gitbranch#name'
-      \ },
-      \ }
-highlight DiffAdd ctermbg=blue ctermfg=blue guibg=green guifg=green
-
-autocmd BufNew,BufNewFile,BufReadPost,BufRead *.txt,*.text,*.md,*.markdown,*.rst setlocal filetype=markdown
-" autocmd BufNewFile,BufReadPost *.md,*.rst setlocal filetype=markdown
-autocmd BufNew,BufNewFile,BufRead *.tex,*.tplx setlocal filetype=tex
-" autocmd BufNew,BufNewFile,BufRead *.c setlocal filetype=c
-
-" Remove all trailing spaces every write
-fun! <SID>StripTrailingWhitespaces()
-    let l = line(".")
-    let c = col(".")
-    %s/\s\+$//e
-    call cursor(l, c)
-endfun
-
 " Setup various plugins
 lua <<EOF
 require("nvim-lsp-installer").setup({})
@@ -131,6 +57,82 @@ monokai.setup {
 }
 EOF
 
+""" Basic vim settings
+" set nocompatible  " nvim is always v-improved
+set smartcase  " use smart case while searching
+set encoding=UTF-8
+set nospell
+set shortmess=a " limited "Hit <Enter> to continue" prompts
+set title " set the title to filename
+set breakindent  " keep indent for long lines that wrap
+set scrolloff=4  " buffer for scrolling
+set history=50 " keep a long history
+let mapleader=" "  " <Leader>
+let printencoding='utf-8'
+
+""" Interacting with filesystem
+set autowrite  " write with :e, :w, etc. Always write to disk
+set autochdir " auto change to directory of file?
+"set formatoptions-=t " don't insert a newline when we get to 80chars!
+" set cliboard+=unnamedplus  " if want system copy/paste integration
+set updatetime=1000  " git gutter/etc every 1s (swap files, etc too)
+set noswapfile " because we save so often
+set undofile                " Save undos after file closes
+set undodir=$HOME/.nvim/nvim/undo " where to save undo histories
+set undolevels=1000         " How many undos
+set undoreload=10000        " number of lines to save for undo
+
+autocmd BufNew,BufNewFile,BufReadPost,BufRead *.txt,*.text,*.md,*.markdown,*.rst setlocal filetype=markdown
+" autocmd BufNewFile,BufReadPost *.md,*.rst setlocal filetype=markdown
+autocmd BufNew,BufNewFile,BufRead *.tex,*.tplx setlocal filetype=tex
+" autocmd BufNew,BufNewFile,BufRead *.c setlocal filetype=c
+
+""" Appearance settings
+syntax on " highlight syntax!
+set termguicolors
+set laststatus=2  " always show status bar
+set noshowmode  " hide --INSERT-- at bottom so buffers always show
+set nu  " set numbers on every line
+set relativenumber  " set relative numbers on every line (except current)
+set numberwidth=2  " because screen not 200 lines tall
+set colorcolumn=80 " highlight comlumn 80
+
+"""  movement/completion
+set completeopt=menu,menuone,preview
+" Move between longlines as if there are no newlines
+nnoremap gj j
+nnoremap gk k
+nnoremap j gj
+nnoremap k gk
+
+""" Plugin settings
+" Find files using Telescope command-line sugar.
+nnoremap <leader>fb <cmd>Telescope buffers<cr>
+nnoremap <leader>fh <cmd>Telescope help_tags<cr>
+nnoremap <leader>ff <cmd>lua require('telescope.builtin').find_files{ cwd = vim.fn.systemlist("git rev-parse --show-toplevel")[1] }<cr>
+nnoremap <leader>ft <cmd>lua require('telescope.builtin').live_grep{ cwd = vim.fn.systemlist("git rev-parse --show-toplevel")[1] }<cr>
+nnoremap <Leader>b :ls<CR>:b<Space>
+
+let g:lightline = {'colorscheme': 'wombat',
+      \ 'active': {
+      \   'left': [ [ 'mode', 'paste' ],
+      \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ]
+      \ },
+      \ 'component_function': {
+      \   'gitbranch': 'gitbranch#name'
+      \ },
+      \ }
+" highlight DiffAdd ctermbg=blue ctermfg=blue guibg=green guifg=green
+" ^for git gutter, handled by monokai colorscheme
+
+" Remove all trailing spaces every write
+fun! <SID>StripTrailingWhitespaces()
+    let l = line(".")
+    let c = col(".")
+    %s/\s\+$//e
+    call cursor(l, c)
+endfun
+autocmd BufWritePre * :call <SID>StripTrailingWhitespace()
 
 " so that lsp-installer places hooks in the right places (according to readme)
 " (this config is longer than I'd like, but it's required; it's from their
