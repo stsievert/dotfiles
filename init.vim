@@ -7,7 +7,7 @@
 "     * Autocomplete: automatic. (<C-n> and <C-p> are vim defaults for
 "       navigating list)
 "     * `K` := view docstring for variable under cursor
-"     * `gd` := go to definition (also highlights; might be some errors here; see source)
+"     * `gD` := go to definition (also highlights; might need to use gd)
 "     * `gr` := see references/where else variable used
 "     * `ge` := view all errors in current file ("go to errors")
 "
@@ -17,8 +17,8 @@
 " * Searching:
 "     *  <leader>ff := find files in current git repo
 "     *  <leader>ft := find text in current git repo
-"     *  <leader>fh := search help tags
 "     *  <leader>fb := search buffers
+"     *  <leader>fh := search (vim) help tags
 "     *  <leader>b := see list of open buffers, select one with decent autocomplete/guessing
 
 call plug#begin()
@@ -41,32 +41,23 @@ Plug 'nvim-treesitter/nvim-treesitter'
 " good vim shortcuts/features
 Plug 'numToStr/Comment.nvim' " `gc` to comment visual regions/lines
 Plug 'wellle/targets.vim'  " new text objects (e.g., `ci,`)
-Plug 'Yggdroot/indentLine'  " display the thin vertical lines on indent
 Plug 'dietsche/vim-lastplace' " keep editing place consitent open/close
 Plug 'airblade/vim-gitgutter'  " show git tags in sidebar
 Plug 'itchyny/vim-gitbranch'  " for showing current git brach
 Plug 'itchyny/lightline.vim'  " for swtatus line
-Plug 'itchyny/vim-gitbranch'
 Plug 'bling/vim-bufferline'  " show opened buffers at bottom
+Plug 'vim-pandoc/vim-pandoc-syntax'  " nice markdown highlighting (usable conceal w/ latex math)
 
 " Colorscheme; other colorschemes supported by treesitter are at [1]
 " [1]: https://github.com/rockerBOO/awesome-neovim#tree-sitter-supported-colorscheme
 Plug 'tanvirtin/monokai.nvim'
 
 Plug 'axelf4/vim-strip-trailing-whitespace'  " only remove whitespace from edited lines
+Plug 'lukas-reineke/indent-blankline.nvim'  " mark indentation level; see https://github.com/vim-pandoc/vim-pandoc-syntax/issues/349
 call plug#end()
 
-" Setup various plugins
-lua <<EOF
-require("nvim-lsp-installer").setup({})
-require('Comment').setup()
-
-local monokai = require('monokai')
-local palette = monokai.pro
-monokai.setup {
-    palette = {base2 = "#181818"}
-}
-EOF
+set mouse=nh  " all modes
+set mousehide  " hide mouse when typing tet
 
 """ Basic vim settings
 " set nocompatible  " nvim is always v-improved
@@ -98,10 +89,9 @@ set undodir=$HOME/.nvim/nvim/undo " where to save undo histories
 set undolevels=1000         " How many undos
 set undoreload=10000        " number of lines to save for undo
 
-autocmd BufNew,BufNewFile,BufReadPost,BufRead *.txt,*.text,*.md,*.markdown,*.rst setlocal filetype=markdown
-" autocmd BufNewFile,BufReadPost *.md,*.rst setlocal filetype=markdown
-autocmd BufNew,BufNewFile,BufRead *.tex,*.tplx setlocal filetype=tex
-" autocmd BufNew,BufNewFile,BufRead *.c setlocal filetype=c
+augroup pandoctexsyntax
+  autocmd BufRead,BufNewFile *.md,*.markdown,*.text,*.txt setlocal filetype=pandoc
+augroup END
 
 """ Appearance settings
 syntax on " highlight syntax!
@@ -122,6 +112,16 @@ nnoremap j gj
 nnoremap k gk
 
 """ Plugin settings
+lua <<EOF
+require("nvim-lsp-installer").setup({})
+require('Comment').setup()
+
+local monokai = require('monokai')
+local palette = monokai.pro
+monokai.setup {
+    palette = {base2 = "#181818"}
+}
+EOF
 " Find files using Telescope command-line sugar.
 nnoremap <leader>fb <cmd>Telescope buffers<cr>
 nnoremap <leader>fh <cmd>Telescope help_tags<cr>
@@ -210,7 +210,6 @@ lua <<EOF
 
   -- Setup lspconfig.
   local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
-  -- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
   local opts = { noremap=true, silent=true }
   -- trimmed config from https://github.com/neovim/nvim-lspconfig
   vim.api.nvim_set_keymap('n', 'ge', '<cmd>lua vim.diagnostic.setloclist()<CR>', opts)
@@ -218,11 +217,8 @@ lua <<EOF
     vim.api.nvim_buf_set_keymap(bufnr, 'n', 'cn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)  -- 'cn' for 'change name'
     vim.api.nvim_buf_set_keymap(bufnr, 'n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
     vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', opts)
-    vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gd', '<cmd>lua vim.lsp.buf.declaration()<CR>', opts)
     vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
     vim.api.nvim_buf_set_keymap(bufnr, 'n', 'cl', '<cmd>lua vim.lsp.buf.formatting()<CR>', opts)
-
-
   end
   require('lspconfig')['pylsp'].setup {
     on_attach = on_attach,
