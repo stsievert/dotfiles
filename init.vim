@@ -3,7 +3,7 @@
 " * Language server protocol: make nvim an IDE
 "     * new language `foo`: `:LspInstall foo`
 "     * `cn` := refactor ("change name")
-"     * `cs` := lint aka "change style" (e.g., Black for Python)
+"     * `cl` := lint aka "change lint" (e.g., Black for Python)
 "     * Autocomplete: automatic. (<C-n> and <C-p> are vim defaults for
 "       navigating list)
 "     * `K` := view docstring for variable under cursor
@@ -220,7 +220,7 @@ lua <<EOF
     vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', opts)
     vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gd', '<cmd>lua vim.lsp.buf.declaration()<CR>', opts)
     vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
-    vim.api.nvim_buf_set_keymap(bufnr, 'n', 'cs', '<cmd>lua vim.lsp.buf.formatting()<CR>', opts)
+    vim.api.nvim_buf_set_keymap(bufnr, 'n', 'cl', '<cmd>lua vim.lsp.buf.formatting()<CR>', opts)
 
 
   end
