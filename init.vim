@@ -1,19 +1,29 @@
-" NOTES:
+" Notes:
 "
-" * Automatic autocompletion
-"     * (if new language: `:LspInstall [lang]`
-" * `gc` to comment/uncomment visual selection
-" * normal editor (git shown in sidebar, last place)
+" * Language server protocol: make nvim an IDE
+"     * new language `foo`: `:LspInstall foo`
+"     * `cn` := refactor ("change name")
+"     * `cs` := lint aka "change style" (e.g., Black for Python)
+"     * Autocomplete: automatic. (<C-n> and <C-p> are vim defaults for
+"       navigating list)
+"     * `K` := view docstring for variable under cursor
+"     * `gd` := go to definition (also highlights; might be some errors here; see source)
+"     * `gr` := see references/where else variable used
+"     * `ge` := view all errors in current file ("go to errors")
+"
+" * Commenting:
+"     * `gc` to comment/uncomment visual selection
+"     * (or `Ngcc` and `gcip` for shortcuts)
 " * Searching:
 "     *  <leader>ff := find files in current git repo
 "     *  <leader>ft := find text in current git repo
 "     *  <leader>fh := search help tags
 "     *  <leader>fb := search buffers
-"     *  <leader>b := see list of open buffers, select one with decent autocomplete
+"     *  <leader>b := see list of open buffers, select one with decent autocomplete/guessing
 
 call plug#begin()
 " Searching
-Plug 'nvim-lua/plenary.nvim'  " for telescope 
+Plug 'nvim-lua/plenary.nvim'  " for telescope
 Plug 'nvim-telescope/telescope.nvim'  " for finding files, searching, etc
 Plug 'BurntSushi/ripgrep'  " required for live_grep
 
@@ -49,7 +59,6 @@ call plug#end()
 " Setup various plugins
 lua <<EOF
 require("nvim-lsp-installer").setup({})
-require'lspconfig'.pylsp.setup{}
 require('Comment').setup()
 
 local monokai = require('monokai')
@@ -71,6 +80,11 @@ set scrolloff=4  " buffer for scrolling
 set history=50 " keep a long history
 let mapleader=" "  " <Leader>
 let printencoding='utf-8'
+
+" Use tabs instead of spaces
+set expandtab  " use spaces instead
+set tabstop=4  " use 4 spaces for tab
+set shiftwidth=4  " autoindent by 4
 
 """ Interacting with filesystem
 set autowrite  " write with :e, :w, etc. Always write to disk
@@ -129,7 +143,8 @@ let g:lightline = {'colorscheme': 'wombat',
 
 " so that lsp-installer places hooks in the right places (according to readme)
 " (this config is longer than I'd like, but it's required; it's from their
-" README and I tried to trim it)
+" README [1] and I tried to trim it)
+" [1]:https://github.com/hrsh7th/nvim-cmp
 lua <<EOF
   -- Setup nvim-cmp.
   local cmp = require'cmp'
@@ -196,7 +211,21 @@ lua <<EOF
   -- Setup lspconfig.
   local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
   -- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
+  local opts = { noremap=true, silent=true }
+  -- trimmed config from https://github.com/neovim/nvim-lspconfig
+  vim.api.nvim_set_keymap('n', 'ge', '<cmd>lua vim.diagnostic.setloclist()<CR>', opts)
+  local on_attach = function(client, bufnr)
+    vim.api.nvim_buf_set_keymap(bufnr, 'n', 'cn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)  -- 'cn' for 'change name'
+    vim.api.nvim_buf_set_keymap(bufnr, 'n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
+    vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', opts)
+    vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gd', '<cmd>lua vim.lsp.buf.declaration()<CR>', opts)
+    vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
+    vim.api.nvim_buf_set_keymap(bufnr, 'n', 'cs', '<cmd>lua vim.lsp.buf.formatting()<CR>', opts)
+
+
+  end
   require('lspconfig')['pylsp'].setup {
-    capabilities = capabilities
+    on_attach = on_attach,
+    capabilities = capabilities,
   }
 EOF
