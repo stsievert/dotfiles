@@ -220,8 +220,30 @@ lua <<EOF
     vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
     vim.api.nvim_buf_set_keymap(bufnr, 'n', 'cl', '<cmd>lua vim.lsp.buf.formatting()<CR>', opts)
   end
-  require('lspconfig')['pylsp'].setup {
+  lspconfig = require('lspconfig')
+  pylsp = lspconfig["pylsp"]
+  pylsp.setup {
     on_attach = on_attach,
     capabilities = capabilities,
+    settings = {
+      pylsp = {
+        configurationSources = {"mypy"},
+        plugins = {
+          flake8 = {enabled = false},
+          mccabe = {enabled = true},  -- function complexity
+          preload = {enabled = true},
+          pycodestyle = {
+              enabled = true,
+              ignore = {"E226","E302","E41","E501","C0103","C0111", "E501", "W291"},
+              select = {},
+              maxLineLength = 88,
+          },
+          pydocstyle = {enabled = false},
+		  pyflakes = {enabled = false},
+          pylint = {enabled = false},
+          yapf = {enabled = false},
+        }
+      }
+    }
   }
 EOF
