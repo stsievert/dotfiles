@@ -249,13 +249,18 @@ lua <<EOF
     }
   }
 
--- good article on customizations (floating window for errors... good idea)
--- https://github.com/neovim/nvim-lspconfig/wiki/UI-Customization
+  -- good article on customizations (floating window for errors... good idea)
+  -- https://github.com/neovim/nvim-lspconfig/wiki/UI-Customization
   local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
   vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
     vim.lsp.diagnostic.on_publish_diagnostics, {
       -- disable virtual text
-      virtual_text = {spacing = 16, severity = vim.diagnostic.severity.ERROR},
+      -- note: `:help vim.diagnostic.config` is also useful
+      virtual_text = {
+        spacing = 16,
+        severity = vim.diagnostic.severity.ERROR,
+        prefix = '←', -- Could be '●', '▎', 'x'
+      },
       severity_sort = true,
 
       -- show signs in gutter
@@ -265,10 +270,6 @@ lua <<EOF
       update_in_insert = false,
     }
   )
-  vim.diagnostic.config({
-    virtual_text = {
-      prefix = '■', -- Could be '●', '▎', 'x'
-    }
-  })
-
 EOF
+set updatetime=1000
+autocmd CursorHold,CursorHoldI * silent! lua vim.lsp.buf.signature_help()
