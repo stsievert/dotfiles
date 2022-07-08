@@ -9,7 +9,7 @@
 "     * `K` := view docstring for variable under cursor
 "     * `gD` := go to definition (also highlights; might need to use gd)
 "     * `gr` := see references/where else variable used
-"     * `ge` := view all errors in current file ("go to errors")
+"     * `ge` := view error for current line
 "
 " * Commenting:
 "     * `gc` to comment/uncomment visual selection
@@ -212,7 +212,9 @@ lua <<EOF
   local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
   local opts = { noremap=true, silent=true }
   -- trimmed config from https://github.com/neovim/nvim-lspconfig
-  vim.api.nvim_set_keymap('n', 'ge', '<cmd>lua vim.diagnostic.setloclist()<CR>', opts)
+
+  -- `ge` for "go error"
+  vim.api.nvim_set_keymap('n', 'ge', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', opts)
   local on_attach = function(client, bufnr)
     vim.api.nvim_buf_set_keymap(bufnr, 'n', 'cn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)  -- 'cn' for 'change name'
     vim.api.nvim_buf_set_keymap(bufnr, 'n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
@@ -233,7 +235,7 @@ lua <<EOF
           mccabe = {enabled = true},  -- function complexity
           preload = {enabled = true},
           pycodestyle = {
-              enabled = true,
+              enabled = false,
               ignore = {"E226","E302","E41","E501","C0103","C0111", "E501", "W291"},
               select = {},
               maxLineLength = 88,
@@ -246,4 +248,27 @@ lua <<EOF
       }
     }
   }
+
+-- good article on customizations (floating window for errors... good idea)
+-- https://github.com/neovim/nvim-lspconfig/wiki/UI-Customization
+  local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
+  vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
+    vim.lsp.diagnostic.on_publish_diagnostics, {
+      -- disable virtual text
+      virtual_text = {spacing = 16},
+      severity_sort = true,
+
+      -- show signs in gutter
+      signs = true,
+
+      -- delay update diagnostics until insert mode left
+      update_in_insert = false,
+    }
+  )
+  vim.diagnostic.config({
+    virtual_text = {
+      prefix = '■', -- Could be '●', '▎', 'x'
+    }
+  })
+
 EOF
