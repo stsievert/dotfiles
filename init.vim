@@ -255,7 +255,7 @@ lua <<EOF
   vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
     vim.lsp.diagnostic.on_publish_diagnostics, {
       -- disable virtual text
-      virtual_text = {spacing = 16},
+      virtual_text = {spacing = 16, severity = vim.diagnostic.severity.ERROR},
       severity_sort = true,
 
       -- show signs in gutter
