@@ -10,6 +10,8 @@
 "     * `gD` := go to definition (also highlights; might need to use gd)
 "     * `gr` := see references/where else variable used
 "     * `ge` := view error for current line
+"     * `<space>gq` to format entire file (with Black for Python)
+"     * `cn` for "change name"
 "
 " * Commenting:
 "     * `gc` to comment/uncomment visual selection
@@ -20,6 +22,8 @@
 "     *  <leader>fb := search buffers
 "     *  <leader>fh := search (vim) help tags
 "     *  <leader>b := see list of open buffers, select one with decent autocomplete/guessing
+"
+"     Run `pip install python-lsp-black`
 
 call plug#begin()
 " Searching
@@ -221,6 +225,7 @@ lua <<EOF
     vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', opts)
     vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
     vim.api.nvim_buf_set_keymap(bufnr, 'n', 'cl', '<cmd>lua vim.lsp.buf.formatting()<CR>', opts)
+    vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gq', '<cmd>lua vim.lsp.buf.formatting()<CR>', opts)
   end
   lspconfig = require('lspconfig')
   pylsp = lspconfig["pylsp"]
@@ -231,6 +236,8 @@ lua <<EOF
       pylsp = {
         configurationSources = {"mypy"},
         plugins = {
+          black = {enabled = true},
+          mypy = {enabled = true},
           flake8 = {enabled = false},
           mccabe = {enabled = true},  -- function complexity
           preload = {enabled = true},
@@ -257,7 +264,7 @@ lua <<EOF
       -- disable virtual text
       -- note: `:help vim.diagnostic.config` is also useful
       virtual_text = {
-        spacing = 16,
+        spacing = 5,
         severity = vim.diagnostic.severity.ERROR,
         prefix = '←', -- Could be '●', '▎', 'x'
       },
@@ -271,5 +278,5 @@ lua <<EOF
     }
   )
 EOF
-set updatetime=1000
-autocmd CursorHold,CursorHoldI * silent! lua vim.lsp.buf.signature_help()
+" set updatetime=1000
+" autocmd CursorHold,CursorHoldI * silent! lua vim.lsp.buf.signature_help()
