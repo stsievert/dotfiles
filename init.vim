@@ -1,3 +1,6 @@
+" Tested w/ neovim 0.9+dev
+" :PlugUpdate   " to update
+" pip install --upgrade python-lsp-server
 " Notes:
 "
 " * Language server protocol: make nvim an IDE
@@ -83,15 +86,19 @@ set shiftwidth=4  " autoindent by 4
 
 """ Interacting with filesystem
 set autowrite  " write with :e, :w, etc. Always write to disk
-set autochdir " auto change to directory of file?
+" set autochdir " auto change to directory of file?
 "set formatoptions-=t " don't insert a newline when we get to 80chars!
-" set cliboard+=unnamedplus  " if want system copy/paste integration
+" set clipboard+=unnamedplus  " if want system copy/paste integration
 set updatetime=1000  " git gutter/etc every 1s (swap files, etc too)
 set noswapfile " because we save so often
 set undofile                " Save undos after file closes
 set undodir=$HOME/.nvim/nvim/undo " where to save undo histories
 set undolevels=1000         " How many undos
 set undoreload=10000        " number of lines to save for undo
+
+" <leader>c to copy from system clipboard
+vnoremap <leader>c "*y
+imap <leader>v <ESC>"+pa
 
 augroup pandoctexsyntax
   autocmd BufRead,BufNewFile *.md,*.markdown,*.text,*.txt setlocal filetype=pandoc
@@ -116,21 +123,13 @@ nnoremap j gj
 nnoremap k gk
 
 """ Plugin settings
-lua <<EOF
-require("nvim-lsp-installer").setup({})
-require('Comment').setup()
 
-local monokai = require('monokai')
-local palette = monokai.pro
-monokai.setup {
-    palette = {base2 = "#181818"}
-}
-EOF
 " Find files using Telescope command-line sugar.
 nnoremap <leader>fb <cmd>Telescope buffers<cr>
 nnoremap <leader>fh <cmd>Telescope help_tags<cr>
-nnoremap <leader>ff <cmd>lua require('telescope.builtin').find_files{ cwd = vim.fn.systemlist("git rev-parse --show-toplevel")[1] }<cr>
-nnoremap <leader>ft <cmd>lua require('telescope.builtin').live_grep{ cwd = vim.fn.systemlist("git rev-parse --show-toplevel")[1] }<cr>
+nnoremap <leader>ff <cmd>lua require('telescope.builtin').git_files{ show_untracked = false, cwd = vim.fn.systemlist("git rev-parse --show-toplevel")[1] }<cr>
+nnoremap <leader>fF <cmd>lua require('telescope.builtin').find_files{ cwd = vim.fn.systemlist("git rev-parse --show-toplevel")[1] }<cr>
+nnoremap <leader>ft <cmd>lua require('telescope.builtin').live_grep()<cr>
 nnoremap <Leader>b :ls<CR>:b<Space>
 
 let g:lightline = {'colorscheme': 'wombat',
@@ -213,7 +212,7 @@ lua <<EOF
   })
 
   -- Setup lspconfig.
-  local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+  local capabilities = require('cmp_nvim_lsp').default_capabilities()
   local opts = { noremap=true, silent=true }
   -- trimmed config from https://github.com/neovim/nvim-lspconfig
 
@@ -280,3 +279,11 @@ lua <<EOF
 EOF
 " set updatetime=1000
 " autocmd CursorHold,CursorHoldI * silent! lua vim.lsp.buf.signature_help()
+
+lua << EOF
+require("nvim-lsp-installer").setup({})
+require('Comment').setup()
+local monokai = require('monokai')
+local palette = monokai.pro
+monokai.setup { palette =  { base2 = "#181818", } }
+EOF
