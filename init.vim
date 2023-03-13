@@ -12,7 +12,7 @@
 "     * `K` := view docstring for variable under cursor
 "     * `gD` := go to definition (also highlights; might need to use gd)
 "     * `gr` := see references/where else variable used
-"     * `ge` := view error for current line
+"     * `gm` := view message for current line
 "     * `<space>gq` to format entire file (with Black for Python)
 "     * `cn` for "change name"
 "
@@ -39,7 +39,6 @@ Plug 'neovim/nvim-lspconfig'  " Common LSP configs
 Plug 'williamboman/nvim-lsp-installer'  " allow installing LSPs with `:LspInstall python`
 Plug 'hrsh7th/nvim-cmp'  " LSP completion (recommended by nvim-lspconfig)
 Plug 'hrsh7th/cmp-vsnip'  " use <C-n> and <C-p> to bring up autocomplete menu
-Plug 'hrsh7th/vim-vsnip'
 Plug 'hrsh7th/cmp-nvim-lsp'
 
 " Syntax highlighting
@@ -216,8 +215,8 @@ lua <<EOF
   local opts = { noremap=true, silent=true }
   -- trimmed config from https://github.com/neovim/nvim-lspconfig
 
-  -- `ge` for "go error"
-  vim.api.nvim_set_keymap('n', 'ge', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', opts)
+  -- `gm` for "go message"
+  vim.keymap.set('n', 'gm', vim.diagnostic.open_float, opts)
   local on_attach = function(client, bufnr)
     vim.api.nvim_buf_set_keymap(bufnr, 'n', 'cn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)  -- 'cn' for 'change name'
     vim.api.nvim_buf_set_keymap(bufnr, 'n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
@@ -226,64 +225,39 @@ lua <<EOF
     vim.api.nvim_buf_set_keymap(bufnr, 'n', 'cl', '<cmd>lua vim.lsp.buf.formatting()<CR>', opts)
     vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gq', '<cmd>lua vim.lsp.buf.formatting()<CR>', opts)
   end
-  lspconfig = require('lspconfig')
-  pylsp = lspconfig["pylsp"]
-  pylsp.setup {
-    on_attach = on_attach,
-    capabilities = capabilities,
-    settings = {
-      pylsp = {
-        configurationSources = {"mypy"},
-        plugins = {
-          black = {enabled = true},
-          mypy = {enabled = true},
-          flake8 = {enabled = false},
-          mccabe = {enabled = true},  -- function complexity
-          preload = {enabled = true},
-          pycodestyle = {
-              enabled = false,
-              ignore = {"E226","E302","E41","E501","C0103","C0111", "E501", "W291"},
-              select = {},
-              maxLineLength = 88,
-          },
-          pydocstyle = {enabled = false},
-		  pyflakes = {enabled = false},
-          pylint = {enabled = false},
-          yapf = {enabled = false},
-        }
-      }
-    }
-  }
 
-  -- good article on customizations (floating window for errors... good idea)
-  -- https://github.com/neovim/nvim-lspconfig/wiki/UI-Customization
-  local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
-  vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
-    vim.lsp.diagnostic.on_publish_diagnostics, {
-      -- disable virtual text
-      -- note: `:help vim.diagnostic.config` is also useful
-      virtual_text = {
-        spacing = 5,
-        severity = vim.diagnostic.severity.ERROR,
-        prefix = '←', -- Could be '●', '▎', 'x'
-      },
-      severity_sort = true,
-
-      -- show signs in gutter
-      signs = true,
-
-      -- delay update diagnostics until insert mode left
-      update_in_insert = false,
-    }
-  )
-EOF
-" set updatetime=1000
-" autocmd CursorHold,CursorHoldI * silent! lua vim.lsp.buf.signature_help()
-
-lua << EOF
-require("nvim-lsp-installer").setup({})
-require('Comment').setup()
+  ---- python specific nvim config
+  -- require("nvim-lsp-installer").setup({})
+  -- require('Comment').setup()
 local monokai = require('monokai')
 local palette = monokai.pro
 monokai.setup { palette =  { base2 = "#181818", } }
+  lspconfig = require('lspconfig')
+  pylsp = lspconfig["pylsp"]
+  pylsp.setup {
+    configurationSources = {"mypy"},
+    plugins = {
+        mypy = {enabled = true},
+        pyflakes = {enabled = true},
+        black = {enabled = false},
+        flake8 = {enabled = false},
+        mccabe = {enabled = false},  -- function complexity
+        preload = {enabled = false},
+        pydocstyle = {enabled = false},
+        pylint = {enabled = false},
+        yapf = {enabled = false},
+        autopep8 = {enabled = false},
+        rope = {enabled = false},
+        pyline = {enabled = false},
+        pycodestyle = {
+            enabled = false,
+            ignore = {"E226","E302","E41","E501","C0103","C0111", "E501", "W291", "E305", "E302"},
+            select = {},
+            maxLineLength = 88,
+         },
+    }
+  }
 EOF
+
+" set updatetime=1000
+" autocmd CursorHold,CursorHoldI * silent! lua vim.lsp.buf.signature_help()
