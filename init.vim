@@ -40,6 +40,7 @@ Plug 'williamboman/nvim-lsp-installer'  " allow installing LSPs with `:LspInstal
 Plug 'hrsh7th/nvim-cmp'  " LSP completion (recommended by nvim-lspconfig)
 Plug 'hrsh7th/cmp-vsnip'  " use <C-n> and <C-p> to bring up autocomplete menu
 Plug 'hrsh7th/cmp-nvim-lsp'
+Plug 'hrsh7th/cmp-cmdline'  " https://github.com/hrsh7th/nvim-cmp/issues/1486
 
 " Syntax highlighting
 Plug 'nvim-treesitter/nvim-treesitter'
