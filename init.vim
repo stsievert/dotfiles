@@ -230,32 +230,36 @@ lua <<EOF
   ---- python specific nvim config
   -- require("nvim-lsp-installer").setup({})
   -- require('Comment').setup()
-local monokai = require('monokai')
-local palette = monokai.pro
-monokai.setup { palette =  { base2 = "#181818", } }
+  local monokai = require('monokai')
+  local palette = monokai.pro
+  monokai.setup { palette =  { base2 = "#181818", } }
   lspconfig = require('lspconfig')
   pylsp = lspconfig["pylsp"]
-  pylsp.setup {
-    configurationSources = {"mypy"},
-    plugins = {
-        mypy = {enabled = true},
-        pyflakes = {enabled = true},
-        black = {enabled = false},
-        flake8 = {enabled = false},
-        mccabe = {enabled = false},  -- function complexity
-        preload = {enabled = false},
-        pydocstyle = {enabled = false},
-        pylint = {enabled = false},
-        yapf = {enabled = false},
-        autopep8 = {enabled = false},
-        rope = {enabled = false},
-        pyline = {enabled = false},
-        pycodestyle = {
+  require('lspconfig').pylsp.setup {
+    settings = {
+      pylsp = {
+        -- configurationSources = {"mypy"},
+        plugins = {
+          mypy = {enabled = true},
+          pyflakes = {enabled = true},
+          black = {enabled = true},
+          flake8 = {enabled = false},
+          mccabe = {enabled = false},  -- function complexity
+          preload = {enabled = false},
+          pydocstyle = {enabled = false},
+          pylint = {enabled = false},
+          yapf = {enabled = false},
+          autopep8 = {enabled = false},
+          rope = {enabled = false},
+          pyline = {enabled = false},
+          pycodestyle = {
             enabled = false,
             ignore = {"E226","E302","E41","E501","C0103","C0111", "E501", "W291", "E305", "E302"},
             select = {},
             maxLineLength = 88,
-         },
+          },
+        }
+      }
     }
   }
 EOF
