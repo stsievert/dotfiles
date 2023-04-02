@@ -98,7 +98,7 @@ set undoreload=10000        " number of lines to save for undo
 
 " <leader>c to copy from system clipboard
 vnoremap <leader>c "*y
-imap <leader>v <ESC>"+pa
+"imap <leader>v <ESC>"+pa
 
 augroup pandoctexsyntax
   autocmd BufRead,BufNewFile *.md,*.markdown,*.text,*.txt setlocal filetype=pandoc
@@ -127,7 +127,10 @@ nnoremap k gk
 " Find files using Telescope command-line sugar.
 nnoremap <leader>fb <cmd>Telescope buffers<cr>
 nnoremap <leader>fh <cmd>Telescope help_tags<cr>
-nnoremap <leader>ff <cmd>lua require('telescope.builtin').git_files{ show_untracked = false, cwd = vim.fn.systemlist("git rev-parse --show-toplevel")[1] }<cr>
+
+" show all files
+noremap <leader>ff <cmd>lua require('telescope.builtin').git_files{ recurse_submodules = true, show_untracked = false, cwd = vim.fn.systemlist("git rev-parse --show-toplevel")[1] }<cr>
+" show only files in git
 nnoremap <leader>fF <cmd>lua require('telescope.builtin').find_files{ cwd = vim.fn.systemlist("git rev-parse --show-toplevel")[1] }<cr>
 nnoremap <leader>ft <cmd>lua require('telescope.builtin').live_grep()<cr>
 nnoremap <Leader>b :ls<CR>:b<Space>

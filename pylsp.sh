@@ -7,6 +7,8 @@ echo "" && echo "### Installing mypy..."
 sleep 1
 ~/.local/share/nvim/lsp_servers/pylsp/venv/bin/pip install --upgrade pylsp-mypy
 ~/.local/share/nvim/lsp_servers/pylsp/venv/bin/pip install --upgrade "python-lsp-server[all]"
+~/.local/share/nvim/lsp_servers/pylsp/venv/bin/pip install --upgrade "python-lsp-black"
+~/.local/share/nvim/lsp_servers/pylsp/venv/bin/pip install --upgrade "python-lsp-mypy"
 
 pip install --upgrade pylsp-mypy
 pip install --upgrade "python-lsp-server[all]"
