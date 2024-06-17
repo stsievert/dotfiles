@@ -61,14 +61,19 @@ Plug 'tanvirtin/monokai.nvim'
 
 Plug 'axelf4/vim-strip-trailing-whitespace'  " only remove whitespace from edited lines
 Plug 'lukas-reineke/indent-blankline.nvim'  " mark indentation level; see https://github.com/vim-pandoc/vim-pandoc-syntax/issues/349
+Plug 'nvim-orgmode/orgmode'
+Plug 'vim-scripts/Align'  " align characters
 call plug#end()
+
 
 set mouse=nh  " all modes
 set mousehide  " hide mouse when typing tet
 
+
 """ Basic vim settings
 " set nocompatible  " nvim is always v-improved
 set smartcase  " use smart case while searching
+set cmdheight=2  " reduce number of "hit enter because file written" prompts
 set encoding=UTF-8
 set nospell
 set shortmess=a " limited "Hit <Enter> to continue" prompts
@@ -152,6 +157,36 @@ let g:lightline = {'colorscheme': 'wombat',
 " README [1] and I tried to trim it)
 " [1]:https://github.com/hrsh7th/nvim-cmp
 lua <<EOF
+
+  require('orgmode').setup({
+    org_agenda_files = {'~/wiki/org/*', '~/Developer/stsievert/radadamp/TODO.org'},
+    org_default_notes_file = '~/wiki/org/refile.org',
+    org_todo_keywords = {'TODO(t)', 'NEXT(n)', 'BLOCKED(b)', '|', 'DONE(d)'},
+    org_startup_folded = 'content',
+    calendar_week_start_day=0, -- start on sunday
+    org_deadline_warning_days=7,
+    org_agenda_skip_scheduled_if_done=true,
+    win_split_mode="30split",
+    mappings = {
+     global = {
+        org_agenda = 'ga',
+        org_capture = 'gc',
+        org_refile = 'mR',
+        org_toggle_archive_tag = "m$",
+      },
+     agenda = {
+        org_agenda_refile = 'mR',
+        org_agenda_archive = "m$",
+     }
+    },
+  })
+  -- go overview
+  vim.keymap.set("n", "gO", ":args ~/wiki/org/*.org<CR>")  -- :n and :N to scroll through buffers
+  -- go refile
+  vim.keymap.set("n", "gR", ":e ~/wiki/org/refile.org<CR>")  -- :n and :N to scroll through buffers
+EOF
+
+lua <<EOF
   -- Setup nvim-cmp.
   local cmp = require'cmp'
 
@@ -179,6 +214,7 @@ lua <<EOF
     sources = cmp.config.sources({
       { name = 'nvim_lsp' },
       { name = 'vsnip' }, -- For vsnip users.
+      { name = 'orgmode' } -- for orgmode
       -- { name = 'luasnip' }, -- For luasnip users.
       -- { name = 'ultisnips' }, -- For ultisnips users.
       -- { name = 'snippy' }, -- For snippy users.
