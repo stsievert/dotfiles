@@ -7,7 +7,8 @@ echo "alias g='git'" >> ~/.bashrc
 echo "[alias]\n  s = status\n  c = commit\n  a = add" >> ~/.gitconfig
 
 echo "Copying nvim config..."
-cp -r nvim ~/.config/nvim
+mkdir ~/.config
+cp -r nvim ~/.config/nvim/
 
 echo "Installing nvim..."
 curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
