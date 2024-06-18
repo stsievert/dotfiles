@@ -1,4 +1,3 @@
-
 echo "Copying tmux config..."
 cp .tmux.conf ~/
 
@@ -42,5 +41,5 @@ apt install -y gcc curl make git neovim
 # Try `apt install libfuse2` per https://askubuntu.com/questions/1363783/cant-run-an-appimage-on-ubuntu-20-04
 
 echo "Installing nvim plugins..."
-~/bin/nvim -c "PlugInstall" -c "qa"
+nvim -c "PlugInstall" -c "qa"
 echo "now run 'bash nvim/pylisp.sh', might fail because of local directory structure. Look at docs in nvim/README.md"
